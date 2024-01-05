@@ -17,14 +17,25 @@ body {
 
 .about-me-container img {
     flex: 1;
-    max-width: 45%; /* Adjust the size of the images */
+    max-width: 49%; /* Adjust the size of the images */
     height: auto;
 }
 
 .about-me-text {
-    flex: 2;
-    text-align: justify;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* A more refined font */
+    color: #333; /* A softer shade of black for readability */
+    font-size: 1.1em; /* Slightly larger font size */
+    line-height: 1.6; /* Improved line spacing for better readability */
+    text-align: justify; /* Justified text for a clean look */
+    padding: 10px; /* Padding for better spacing around the text */
 }
+
+/* Optionally, you can add a hover effect to links within the about me text */
+.about-me-text a:hover {
+    color: #900; /* A shade of red for hover effect */
+    text-decoration: underline;
+}
+
 
 
 /* Header Styles */
