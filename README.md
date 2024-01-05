@@ -1,1 +1,11 @@
-# Portfollio
+LETS GO!! RIOT GAMES!
+
+RIOT REIXYZ 
+
+TFT GAME DEV INTERN
+
+POG
+
+!!!
+
+CAN WIN
