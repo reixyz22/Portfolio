@@ -1,4 +1,4 @@
-/* General Styles */
+/* Generalx Styles */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -6,6 +6,26 @@ body {
     background-color: #f4f4f4;
     color: #333;
 }
+
+.about-me-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+}
+
+.about-me-container img {
+    flex: 1;
+    max-width: 45%; /* Adjust the size of the images */
+    height: auto;
+}
+
+.about-me-text {
+    flex: 2;
+    text-align: justify;
+}
+
 
 /* Header Styles */
 header {
