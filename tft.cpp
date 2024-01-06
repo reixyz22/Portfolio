@@ -2,7 +2,8 @@
 #include <vector>
 #include <bitset>
 #include <string>
-#include <unordered_map>
+#include <array>
+#include <algorithm>
 
 const int MAX_CHAMPIONS = 64;
 const int MAX_TRAITS = 27;
@@ -13,18 +14,18 @@ public:
     int cost;
     std::bitset<MAX_TRAITS> traits;
 
-    Champion(const std::string& n, int c, std::bitset<MAX_TRAITS> t)
+    Champion(const std::string& n, int c, const std::bitset<MAX_TRAITS>& t)
         : name(n), cost(c), traits(t) {}
 };
 
 class Trait {
 public:
     std::string name;
-    std::vector<int> tiers;
-    std::vector<double> values;
+    std::array<int, 4> tiers;
+    std::array<double, 4> values;
 
-    Trait(const std::string& n, std::vector<int> t, std::vector<double> v)
-        : name(n), tiers(std::move(t)), values(std::move(v)) {}
+    Trait(const std::string& n, const std::array<int, 4>& t, const std::array<double, 4>& v)
+        : name(n), tiers(t), values(v) {}
 };
 
 class Game {
@@ -33,7 +34,6 @@ class Game {
 
     double calculateScore(const std::bitset<MAX_CHAMPIONS>& combination) {
         double score = 0.0;
-
         for (const auto& trait : traits) {
             int count = 0;
             for (size_t i = 0; i < champions.size(); ++i) {
@@ -41,7 +41,6 @@ class Game {
                     ++count;
                 }
             }
-
             for (size_t j = 0; j < trait.tiers.size(); ++j) {
                 if (count >= trait.tiers[j]) {
                     score += trait.values[j];
@@ -49,7 +48,6 @@ class Game {
                 }
             }
         }
-
         return score;
     }
 
@@ -60,9 +58,7 @@ class Game {
                 totalCost += champions[i].cost;
             }
         }
-
-        // Example condition: total cost must not exceed 10
-        return totalCost <= 10;
+        return totalCost <= 1000; // Example condition
     }
 
     void findBestCombinationHelper(std::bitset<MAX_CHAMPIONS>& current, int index, double& maxScore, std::bitset<MAX_CHAMPIONS>& bestCombination) {
@@ -88,15 +84,36 @@ public:
     Game(const std::vector<Champion>& champs, const std::vector<Trait>& tr)
         : champions(champs), traits(tr) {}
 
-    std::bitset<MAX_CHAMPIONS> findOptimalCombination() {
+    std::bitset<MAX_CHAMPIONS> findOptimalCombinationWithInitialSet(const std::bitset<MAX_CHAMPIONS>& initialSet) {
         double maxScore = 0.0;
-        std::bitset<MAX_CHAMPIONS> current, bestCombination;
+        std::bitset<MAX_CHAMPIONS> current = initialSet, bestCombination;
         findBestCombinationHelper(current, 0, maxScore, bestCombination);
         std::cout << "Best Score: " << maxScore << std::endl;
         return bestCombination;
     }
 };
+
+std::bitset<MAX_CHAMPIONS> readInitialChampions(const std::vector<Champion>& champions) {
+    std::bitset<MAX_CHAMPIONS> initialSet;
+    std::string input;
+
+    std::cout << "Enter initial champions (type 'done' to finish):" << std::endl;
+    while (std::cin >> input && input != "done") {
+        auto it = std::find_if(champions.begin(), champions.end(),
+                               [&input](const Champion& champ) { return champ.name == input; });
+        if (it != champions.end()) {
+            size_t index = std::distance(champions.begin(), it);
+            initialSet.set(index);
+        } else {
+            std::cout << "Champion not found. Try again." << std::endl;
+        }
+    }
+    return initialSet;
+}
+// ... [previous code] ...
+
 int main() {
+    // Initialize champions and traits here...
     std::vector<Champion> champs = {
         Champion("Alistar", 3, std::bitset<MAX_TRAITS>("000000100000010000010000000")),
         Champion("Annie", 2, std::bitset<MAX_TRAITS>("000000100000000000010000010")),
@@ -189,28 +206,24 @@ int main() {
         Trait("Sureshot",{2,4,99,99},{2.5,8.0}),
     };
 
-    if (champs.empty() || gameTraits.empty()) {
-        std::cout << "Champions or Traits are not initialized correctly." << std::endl;
-        return 1;
-    }
-
-    std::cout << "Starting the game simulation..." << std::endl;
     Game game(champs, gameTraits);
+    std::cout << "Starting the game simulation..." << std::endl;
 
-    std::cout << "Finding the best combination..." << std::endl;
-    std::bitset<MAX_CHAMPIONS> bestCombination = game.findOptimalCombination();
+    // Read initial champions from user
+    auto initialSet = readInitialChampions(champs);
 
-    if (bestCombination.none()) {
-        std::cout << "No valid combination found." << std::endl;
-    } else {
-        // Output the best combination
-        std::cout << "Best Combination: ";
-        for (size_t i = 0; i < MAX_CHAMPIONS; ++i) {
-            if (bestCombination.test(i)) {
-                std::cout << champs[i].name << ", ";
-            }
+    // Find the best combination starting with the initial set
+    std::cout << "Finding the best combination with initial set..." << std::endl;
+    auto bestCombination = game.findOptimalCombinationWithInitialSet(initialSet);
+
+    // Output the best combination
+    std::cout << "Best Combination: ";
+    for (size_t i = 0; i < champs.size(); ++i) {
+        if (bestCombination.test(i)) {
+            std::cout << champs[i].name << ", ";
         }
-        std::cout << std::endl;
     }
+    std::cout << std::endl;
+
     return 0;
 }
